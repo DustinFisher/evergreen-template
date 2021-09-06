@@ -7,7 +7,11 @@ def run_template!
   after_bundle do
     configure_environment_runtime
     configure_docker
+    configure_tests_ci
+    configure_logs
 
+    template "app/README.md", "README.md"
+    
     initial_project_commit_and_branch
   end
 end

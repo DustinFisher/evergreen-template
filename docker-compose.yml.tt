@@ -37,7 +37,6 @@ services:
     environment: &backend_env
       <<: *app_env
       REDIS_URL: redis://redis:6379/
-      SMTP_HOST: mail
       DB_HOST: db
       DB_USER: postgres
       DB_PASSWORD: postgres
@@ -45,25 +44,6 @@ services:
     depends_on:
       - db
       - redis
-
-  rails:
-    <<: *backend
-    command: bundle exec rails server -b 0.0.0.0
-    ports:
-      - ${WEB_PORT:-3000:3000}
-
-  webpack:
-    <<: *app
-    command: ./bin/webpack-dev-server
-    ports:
-      - ${WEBPACK_PORT:-3035:3035}
-    environment:
-      <<: *app_env
-      WEBPACKER_DEV_SERVER_HOST: 0.0.0.0
-
-  sidekiq:
-    <<: *backend
-    command: bundle exec sidekiq -q mailers -q default
 
   db:
     image: postgres:13.4
@@ -82,14 +62,6 @@ services:
       - redis:/data
     ports:
       - 6379
-
-  mail:
-    image: drujensen/mailcatcher:latest
-    ports:
-      - 1025
-      - ${MAIL_WEB_PORT:-1080:1080}
-    networks:
-      default:
 
 volumes:
   db:
