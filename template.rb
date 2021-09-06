@@ -10,7 +10,7 @@ def run_template!
     configure_tests_ci
     configure_logs
 
-    template "app/README.md", "README.md"
+    template "app/README.md", "README.md", force: true
     
     initial_project_commit_and_branch
   end

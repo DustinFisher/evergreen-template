@@ -1,5 +1,6 @@
 def configure_docker
   copy_file 'bin/setup', force: true
+  copy_file 'bin/run', force: true
   copy_file 'Dockerfile'
 
   template "docker-compose.yml"
