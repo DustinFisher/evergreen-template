@@ -19,10 +19,4 @@ def configure_environment_runtime
 .env.*.local”
     RUBY
   end
-
-  inject_into_file 'Gemfile', before: "gem \"dip\", groups: [:development, :test]" do <<-'RUBY'
-# We use this to simplify our local development with containers.
-# It creates the feeling that you work without containers.
-  RUBY
-  end
 end
