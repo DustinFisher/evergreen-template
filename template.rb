@@ -15,8 +15,6 @@ end
 def initial_project_commit_and_branch
   git :init
   git branch: "-m master main"
-  git add: "-A ."
-  git commit: "-n -m 'Intializing a new project'"
 end
 
 # Pulled this function from https://github.com/mattbrictson/rails-template
@@ -27,7 +25,7 @@ def add_template_repository_to_source_path
     at_exit { FileUtils.remove_entry(tempdir) }
     git clone: [
       '--quiet',
-      'https://github.com/dustinfisher/evergreen.git',
+      'https://github.com/dustinfisher/evergreen-template.git',
       tempdir
     ].map(&:shellescape).join(' ')
 
