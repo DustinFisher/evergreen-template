@@ -6,7 +6,17 @@ def run_template!
 
   after_bundle do
     configure_environment_runtime
+    configure_docker
+
+    initial_project_commit_and_branch
   end
+end
+
+def initial_project_commit_and_branch
+  git :init
+  git branch: "-m master main"
+  git add: "-A ."
+  git commit: "-n -m 'Intializing a new project'"
 end
 
 # Pulled this function from https://github.com/mattbrictson/rails-template

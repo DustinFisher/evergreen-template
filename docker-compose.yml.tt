@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  app: &app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PG_VERSION: '13'
+        NODE_VERSION: '14.6.0'
+        NODE_VERSION_MAJOR: '14'
+        YARN_VERSION: '1.22.10'
+    image: <%= @app_name %>:0.1.0
+    tmpfs:
+      - /tmp
+    environment: &app_env
+      RAILS_ENV: ${RAILS_ENV:-development}
+      HISTFILE: /bundle/.bash_history
+      MALLOC_ARENA_MAX: 2
+    networks:
+      default:
+    volumes:
+      - .:/app:cached
+      - rails_cache:/app/tmp/cache
+      - bundle:/bundle
+      - node_modules:/app/node_modules
+      - assets:/app/public/assets
+      - packs:/app/public/packs
+      - packs_test:/app/public/packs-test
+      - .docker/.bashrc:/root/.bashrc:ro
+      - .docker/.pryrc:/app/.pryrc:ro
+      - .docker/.psqlrc:/root/.psqlrc:ro
+      - db_history:/var/log/psql_history
+
+  backend: &backend
+    <<: *app
+    environment: &backend_env
+      <<: *app_env
+      REDIS_URL: redis://redis:6379/
+      SMTP_HOST: mail
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      WEBPACKER_DEV_SERVER_HOST: webpack
+    depends_on:
+      - db
+      - redis
+
+  rails:
+    <<: *backend
+    command: bundle exec rails server -b 0.0.0.0
+    ports:
+      - ${WEB_PORT:-3000:3000}
+
+  webpack:
+    <<: *app
+    command: ./bin/webpack-dev-server
+    ports:
+      - ${WEBPACK_PORT:-3035:3035}
+    environment:
+      <<: *app_env
+      WEBPACKER_DEV_SERVER_HOST: 0.0.0.0
+
+  sidekiq:
+    <<: *backend
+    command: bundle exec sidekiq -q mailers -q default
+
+  db:
+    image: postgres:13.4
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - .docker/.psqlrc:/root/.psqlrc:ro
+      - db:/var/lib/postgresql/data
+      - db_history:/var/log/psql_history
+    ports:
+      - 5432:5432
+
+  redis:
+    image: redis:latest
+    volumes:
+      - redis:/data
+    ports:
+      - 6379
+
+  mail:
+    image: drujensen/mailcatcher:latest
+    ports:
+      - 1025
+      - ${MAIL_WEB_PORT:-1080:1080}
+    networks:
+      default:
+
+volumes:
+  db:
+  db_history:
+  redis:
+  bundle:
+  node_modules:
+  assets:
+  rails_cache:
+  packs:
+  packs_test:
+  bash_history:
