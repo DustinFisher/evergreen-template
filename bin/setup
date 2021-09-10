@@ -28,37 +28,37 @@ def setup
   log ""
   log "To see commonly-needed commands, run:"
   log ""
-  log "    bin/setup help"
+  log "    docker-compose run backend bin/setup help"
   log ""
 end
 
 def help
   log "Useful commands:"
   log ""
-  log "  bin/run"
+  log "  docker-compose up"
   log "     # run app locally"
   log ""
-  log "  LOGRAGE_IN_DEVELOPMENT=true bin/run"
+  log "  LOGRAGE_IN_DEVELOPMENT=true docker-compose up"
   log "     # run app locally using"
   log "     # production-like logging"
   log ""
   log ""
-  log "  bin/ci"
+  log "  docker-compose run backend bin/ci"
   log "     # runs all tests and checks as CI would"
   log ""
-  log "  bin/rails test"
+  log "  docker-compose run backend bin/rails test"
   log "     # run non-system tests"
   log ""
-  log "  bin/rails test:system"
+  log "  docker-compose run backend bin/rails test:system"
   log "     # run system tests"
   log ""
-  log "  bin/setup help"
+  log "  docker-compose run backend bin/setup help"
   log "     # show this help"
   log ""
 end
- 
+
 # start of helpers
- 
+
 # We don't want the setup method to have
 # to do all this error checking, and we
 # also want to explicitly log what we
@@ -73,16 +73,16 @@ def system!(*args)
     abort
   end
 end
-     
+
 # It's helpful to know what messages came
 # from this script, so we'll use log
 # instead of puts to communicate with the user
 def log(message)
   puts "[ bin/setup ] #{message}"
 end
-     
+
 # end of helpers
- 
+
 if ARGV[0] == "help"
   help
 else

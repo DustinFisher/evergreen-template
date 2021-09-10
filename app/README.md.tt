@@ -3,16 +3,21 @@
 ## Setup
 
 1. Pull down the app from version control
-2. Make sure you have Postgres running
-3. `bin/setup`
+2. Make sure you have Docker installed on your machine
+3. `docker-compose up -d db redis`
+4. `docker-compose run backend bin/setup`
 
 ## Running The App
 
-1. `bin/run`
+Run in the foreground 
+1. `docker-compose up`
+
+Run in the background
+2. `docker-compose up -d`
 
 ## Tests and CI
 
-1. `bin/ci` contains all the tests and checks for the app
+1. `docker-compose run backend bin/ci` contains all the tests and checks for the app
 2. `tmp/test.log` will use the production logging format
     *not* the development one.
 
