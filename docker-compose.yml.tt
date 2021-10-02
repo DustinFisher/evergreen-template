@@ -20,11 +20,6 @@ services:
       - bundle:/bundle
       - node_modules:/app/node_modules
       - assets:/app/public/assets
-      - packs:/app/public/packs
-      - packs_test:/app/public/packs-test
-      - .docker/.bashrc:/root/.bashrc:ro
-      - .docker/.pryrc:/app/.pryrc:ro
-      - .docker/.psqlrc:/root/.psqlrc:ro
       - db_history:/var/log/psql_history
 
   backend: &backend
@@ -32,11 +27,9 @@ services:
     environment: &backend_env
       <<: *app_env
       REDIS_URL: redis://redis:6379/
-      SMTP_HOST: mail
       DB_HOST: db
       DB_USER: postgres
       DB_PASSWORD: postgres
-      WEBPACKER_DEV_SERVER_HOST: webpack
     depends_on:
       - db
       - redis
@@ -46,15 +39,6 @@ services:
     command: bundle exec rails server -b 0.0.0.0
     ports:
       - ${WEB_PORT:-3000:3000}
-
-  webpack:
-    <<: *app
-    command: ./bin/webpack-dev-server
-    ports:
-      - ${WEBPACK_PORT:-3035:3035}
-    environment:
-      <<: *app_env
-      WEBPACKER_DEV_SERVER_HOST: 0.0.0.0
 
   sidekiq:
     <<: *backend
@@ -77,14 +61,6 @@ services:
       - redis:/data
     ports:
       - 6379
-
-  mail:
-    image: drujensen/mailcatcher:latest
-    ports:
-      - 1025
-      - ${MAIL_WEB_PORT:-1080:1080}
-    networks:
-      default:
 
 volumes:
   db:

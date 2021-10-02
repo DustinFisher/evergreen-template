@@ -58,8 +58,6 @@ RUN gem update --system && \
   gem uninstall bundler && \
   gem install bundler -v $BUNDLER_VERSION
 
-RUN gem install rails --pre
-
 RUN mkdir -p /app
 
 WORKDIR /app

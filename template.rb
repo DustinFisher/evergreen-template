@@ -11,14 +11,7 @@ def run_template!
     configure_logs
 
     template "app/README.md", "README.md", force: true
-    
-    initial_project_commit_and_branch
   end
-end
-
-def initial_project_commit_and_branch
-  git :init
-  git branch: "-m master main"
 end
 
 # Pulled this function from https://github.com/mattbrictson/rails-template
