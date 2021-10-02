@@ -9,10 +9,6 @@ def run_template!
     configure_docker
     configure_tests_ci
     configure_logs
-    configure_webpacker
-
-    install_hotwire
-    install_tailwind
 
     template "app/README.md", "README.md", force: true
     

@@ -3,5 +3,4 @@ def add_gems
   gem "brakeman"
   gem "bundler-audit"
   gem "lograge"
-  gem "hotwire-rails"
 end

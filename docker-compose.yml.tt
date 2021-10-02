@@ -5,11 +5,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        PG_VERSION: '13'
-        NODE_VERSION: '14.6.0'
-        NODE_VERSION_MAJOR: '14'
-        YARN_VERSION: '1.22.10'
     image: <%= @app_name %>:0.1.0
     tmpfs:
       - /tmp
