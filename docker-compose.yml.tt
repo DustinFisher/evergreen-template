@@ -42,7 +42,7 @@ services:
 
   sidekiq:
     <<: *backend
-    command: bundle exec sidekiq -q mailers -q default
+    command: bundle exec sidekiq
 
   db:
     image: postgres:13.4
