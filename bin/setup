@@ -11,7 +11,7 @@ def setup
   # yarn check indicates we need to. Note that
   # --check-files is needed to force Yarn to actually
   # examine what's in node_modules
-  system! "bin/yarn check --check-files || bin/yarn install"
+  system! "yarn check --check-files || yarn install"
 
   log "Dropping & recreating the development database"
   # Note that the very first time this runs, db:reset

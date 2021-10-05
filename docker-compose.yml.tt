@@ -1,59 +1,74 @@
 version: '3.8'
 
-services:
-  app: &app
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: <%= @app_name %>:0.1.0
-    tmpfs:
-      - /tmp
-    environment: &app_env
-      RAILS_ENV: ${RAILS_ENV:-development}
-      HISTFILE: /bundle/.bash_history
-      MALLOC_ARENA_MAX: 2
-    networks:
-      default:
-    volumes:
-      - .:/app:cached
-      - rails_cache:/app/tmp/cache
-      - bundle:/bundle
-      - node_modules:/app/node_modules
-      - assets:/app/public/assets
-      - db_history:/var/log/psql_history
+x-app: &app
+  build:
+    context: .
+    dockerfile: Dockerfile
+    args:
+      RUBY_VERSION: '3.0.2'
+      PG_MAJOR: '14'
+      NODE_MAJOR: '14'
+      YARN_VERSION: '1.22.5'
+      BUNDLER_VERSION: '2.2.28'
+  environment: &env
+    NODE_ENV: ${NODE_ENV:-development}
+    RAILS_ENV: ${RAILS_ENV:-development}
+    YARN_CACHE_FOLDER: /app/node_modules/.yarn-cache
+  image: <%= @app_name %>:0.1.0
+  tmpfs:
+    - /tmp
 
-  backend: &backend
-    <<: *app
-    environment: &backend_env
-      <<: *app_env
-      REDIS_URL: redis://redis:6379/
-      DB_HOST: db
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-    depends_on:
-      - db
-      - redis
+x-backend: &backend
+  <<: *app
+  stdin_open: true
+  tty: true
+  volumes:
+    - .:/app:cached
+    - rails_cache:/app/tmp/cache
+    - bundle:/usr/local/bundle
+    - node_modules:/app/node_modules
+    - packs:/app/public/packs
+  environment:
+    <<: *env
+    REDIS_URL: redis://redis:6379/
+    BOOTSNAP_CACHE_DIR: /usr/local/bundle/_bootsnap
+    WEB_CONCURRENCY: 0
+    HISTFILE: /app/log/.bash_history
+    PSQL_HISTFILE: /app/log/.psql_history
+    EDITOR: vi
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+  runner:
+    <<: *backend
+    command: /bin/bash
+    ports:
+      - '3000:3000'
+      - '3002:3002'
 
   rails:
     <<: *backend
-    command: bundle exec rails server -b 0.0.0.0
+    command: bash -c "rm -f tmp/pids/server.pid && bin/dev"
     ports:
-      - ${WEB_PORT:-3000:3000}
+      - '5000:3000'
 
-  sidekiq:
-    <<: *backend
-    command: bundle exec sidekiq
-
-  db:
-    image: postgres:13.4
-    environment:
-      POSTGRES_PASSWORD: postgres
+  postgres:
+    image: postgres:14
     volumes:
-      - .docker/.psqlrc:/root/.psqlrc:ro
-      - db:/var/lib/postgresql/data
-      - db_history:/var/log/psql_history
+      - postgres:/var/lib/postgresql/data
+      - ./log:/root/log:cached
+    environment:
+      PSQL_HISTFILE: /root/log/.psql_history
+      POSTGRES_PASSWORD: postgres
     ports:
-      - 5432:5432
+      - 5432
+    healthcheck:
+      test: pg_isready -U postgres -h 127.0.0.1
+      interval: 5s
 
   redis:
     image: redis:latest
@@ -61,15 +76,16 @@ services:
       - redis:/data
     ports:
       - 6379
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
 
 volumes:
-  db:
-  db_history:
+  postgres:
   redis:
   bundle:
   node_modules:
-  assets:
   rails_cache:
   packs:
-  packs_test:
-  bash_history:
