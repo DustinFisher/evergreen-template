@@ -59,11 +59,8 @@ ENV LANG=C.UTF-8 \
   BUNDLE_JOBS=4 \
   BUNDLE_RETRY=3
 
-# Uncomment this line if you store Bundler settings in the project's root
-# ENV BUNDLE_APP_CONFIG=.bundle
-
-# Uncomment this line if you want to run binstubs without prefixing with `bin/` or `bundle exec`
-# ENV PATH /app/bin:$PATH
+# Run binstubs without prefixing with `bin/` or `bundle exec`
+ENV PATH /app/bin:$PATH
 
 # Upgrade RubyGems and install required Bundler version
 # See https://github.com/evilmartians/terraforming-rails/pull/24 for discussion
