@@ -3,7 +3,6 @@ FROM ruby:$RUBY_VERSION-slim-buster
 
 ARG PG_MAJOR
 ARG NODE_MAJOR
-ARG BUNDLER_VERSION
 ARG YARN_VERSION
 ARG NPM_VERSION
 
@@ -71,7 +70,7 @@ ENV LANG=C.UTF-8 \
 RUN gem update --system && \
   rm /usr/local/lib/ruby/gems/*/specifications/default/bundler-*.gemspec && \
   gem uninstall bundler && \
-  gem install bundler -v $BUNDLER_VERSION
+  gem install bundler
 
 RUN gem install foreman
 
