@@ -5,6 +5,7 @@ ARG PG_MAJOR
 ARG NODE_MAJOR
 ARG BUNDLER_VERSION
 ARG YARN_VERSION
+ARG NPM_VERSION
 
 # Common dependencies
 RUN apt-get update -qq \
@@ -75,7 +76,7 @@ RUN gem update --system && \
 RUN gem install foreman
 
 # Update to latest npm
-RUN npm install -g npm@lts
+RUN npm install -g npm@$NPM_VERSION
 
 # Create a directory for the app code
 RUN mkdir -p /app
